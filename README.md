@@ -1,2 +1,3 @@
 # moveloto
-Lotery in move
+
+Just trying a lotery system in move!
