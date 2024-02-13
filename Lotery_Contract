@@ -1,0 +1,37 @@
+module Lottery {
+    use  0x1::Signer;
+    use  0x1::Vector;
+    use  0x1::Random;
+
+    struct LotteryState has key {
+        pot: u64,
+        tickets: vector<address>,
+        winner: bool,
+    }
+
+    public fun initialize(account: &signer) {
+        let lottery_state = LotteryState {
+            pot:  0,
+            tickets: Vector::empty<address>(),
+            winner: false,
+        };
+        move_to(account, lottery_state);
+    }
+
+    public fun buy_ticket(account: &signer) acquires LotteryState {
+        let lottery_state = borrow_global_mut<LotteryState>(Signer::address_of(account));
+        lottery_state.pot = lottery_state.pot +  1;
+        Vector::push_back(&mut lottery_state.tickets, Signer::address_of(account));
+    }
+
+    public fun draw_winner() acquires LotteryState {
+        let lottery_state = borrow_global_mut<LotteryState>(Signer::address_of(account));
+        if (!lottery_state.winner && Vector::length(&lottery_state.tickets) >  0) {
+            let index = Random::next_u64() % Vector::length(&lottery_state.tickets);
+            let winner_address = *Vector::borrow(&lottery_state.tickets, index);
+            lottery_state.winner = true;
+            // Transfer the pot to the winner (this is a placeholder)
+            // You would need to integrate with the currency module to actually transfer funds
+        }
+    }
+}
